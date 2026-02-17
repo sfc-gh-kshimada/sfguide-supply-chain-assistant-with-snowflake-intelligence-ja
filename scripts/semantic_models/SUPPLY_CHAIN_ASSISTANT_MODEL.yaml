@@ -28,49 +28,50 @@ tables:
           - industry_sector
           - organization_unit
           - product_line
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: CITY
         synonyms:
           - municipality
           - supplier_city
           - town
           - vendor_city
-        description: City of the supplier
+        description: サプライヤーの所在都市
         expr: CITY
         data_type: VARCHAR(100)
         sample_values:
-          - Seattle
-          - Phoenix
-          - Wichita
+          - 刈谷市
+          - 長岡京市
+          - 港区
       - name: CONTACT_PERSON_NAME
         synonyms:
           - contact_name
           - supplier_contact
           - vendor_contact
-        description: Primary contact person at the supplier
+        description: サプライヤーの担当者名
         expr: CONTACT_PERSON_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - Sarah Johnson
-          - Michael Chen
-          - Jennifer Davis
+          - 田中太郎
+          - 鈴木一郎
+          - 佐藤花子
       - name: COUNTRY
         synonyms:
           - nation
           - supplier_country
           - vendor_country
-        description: Country of the supplier
+        description: サプライヤーの国
         expr: COUNTRY
         data_type: VARCHAR(50)
         sample_values:
-          - USA
+          - JPN
       - name: IS_PREFERRED
         synonyms:
           - is_preferred_vendor
@@ -91,9 +92,9 @@ tables:
         expr: STATE
         data_type: VARCHAR(50)
         sample_values:
-          - WA
-          - AZ
-          - KS
+          - 愛知県
+          - 京都府
+          - 東京都
       - name: SUPPLIER_ID
         synonyms:
           - supplier_key
@@ -117,9 +118,9 @@ tables:
         expr: SUPPLIER_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - Aerospace Materials Corp
-          - Titanium Alloys International
-          - Carbon Fiber Solutions
+          - デンソー
+          - 村田製作所
+          - 東レ
       - name: SUPPLIER_TYPE
         synonyms:
           - supplier_category
@@ -271,9 +272,9 @@ tables:
         expr: ADDRESS
         data_type: VARCHAR(255)
         sample_values:
-          - 1 Skyview Dr
-          - 1050 Delta Blvd
-          - 100 N Riverside Plaza
+          - トヨタ町1
+          - 白子町1-1
+          - 中区板屋町111
       - name: BUSINESS_LINE
         synonyms:
           - business_unit
@@ -283,14 +284,15 @@ tables:
           - industry_sector
           - organization_unit
           - product_line
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: CITY
         synonyms:
           - city_name
@@ -300,13 +302,13 @@ tables:
           - town
           - urban_area
           - urban_center
-        description: City of the facility
+        description: 工場の所在都市
         expr: CITY
         data_type: VARCHAR(100)
         sample_values:
-          - Fort Worth
-          - Atlanta
-          - Seattle
+          - 豊田市
+          - 品川区
+          - 四日市市
       - name: COUNTRY
         synonyms:
           - geographical_area
@@ -321,7 +323,7 @@ tables:
         expr: COUNTRY
         data_type: VARCHAR(50)
         sample_values:
-          - USA
+          - JPN
       - name: IS_ACTIVE
         synonyms:
           - active_status
@@ -359,9 +361,9 @@ tables:
         expr: MFG_PLANT_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - Phoenix Aerospace Manufacturing
-          - Seattle Aircraft Components
-          - Wichita Aviation Systems
+          - 豊田自動車部品工場
+          - 品川エレクトロニクス工場
+          - 四日市繊維工場
       - name: STATE
         synonyms:
           - administrative_area
@@ -374,9 +376,9 @@ tables:
         expr: STATE
         data_type: VARCHAR(50)
         sample_values:
-          - TX
-          - GA
-          - WA
+          - 愛知県
+          - 東京都
+          - 三重県
       - name: ZIP_CODE
         synonyms:
           - geographic_code
@@ -385,13 +387,13 @@ tables:
           - postal_code
           - postcode
           - zip
-        description: Postal code of the facility
+        description: 工場の郵便番号
         expr: ZIP_CODE
         data_type: VARCHAR(20)
         sample_values:
-          - '76155'
-          - '30354'
-          - '98101'
+          - '471-8571'
+          - '108-0075'
+          - '510-8527'
     facts:
       - name: LATITUDE
         synonyms:
@@ -480,14 +482,15 @@ tables:
           - market_segment
           - organization_unit
           - product_line
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: COMPONENT_DESCRIPTION
         synonyms:
           - component_commentary
@@ -500,9 +503,9 @@ tables:
         expr: COMPONENT_DESCRIPTION
         data_type: VARCHAR(1024)
         sample_values:
-          - Primary flight control printed circuit board with redundant processing units for commercial aircraft
-          - High-temperature resistant turbine blade assembly for jet engines with ceramic coating
-          - Integrated GPS/INS navigation sensor module for aircraft positioning and guidance
+          - 冗長処理ユニット搭載の車両統合制御用プリント基板
+          - セラミックコーティング付き高温耐性ターボチャージャー組立品
+          - Eガラスクロス、プリント基板積層板用の主要補強材
       - name: COMPONENT_ID
         synonyms:
           - component_key
@@ -530,9 +533,9 @@ tables:
         expr: COMPONENT_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - Flight Control PCB
-          - Turbine Blade Assembly
-          - Navigation Sensor Module
+          - 車両制御ECU基板
+          - ターボチャージャーアセンブリ
+          - ガラスクロス（電子基板用）
     primary_key:
       columns:
         - COMPONENT_ID
@@ -550,14 +553,15 @@ tables:
           - division
           - organization_unit
           - product_line
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: PRODUCT_CATEGORY
         synonyms:
           - category_name
@@ -570,9 +574,9 @@ tables:
         expr: PRODUCT_CATEGORY
         data_type: VARCHAR(100)
         sample_values:
-          - Avionics
-          - Engine Systems
-          - Safety Systems
+          - 制御システム
+          - パワートレイン
+          - 複合材料
       - name: PRODUCT_DESCRIPTION
         synonyms:
           - item_description
@@ -585,9 +589,9 @@ tables:
         expr: PRODUCT_DESCRIPTION
         data_type: VARCHAR(1024)
         sample_values:
-          - Complete flight management system for commercial aircraft with navigation and autopilot capabilities
-          - Real-time engine health monitoring system with predictive maintenance capabilities
-          - Advanced weather detection radar system for aircraft with turbulence prediction
+          - ナビゲーション・自動運転支援機能搭載の車両統合制御システム
+          - リアルタイムエンジン状態監視・予知保全機能搭載システム
+          - ガラス繊維・炭素繊維複合材パネル、自動車・建材向け軽量高強度部材
       - name: PRODUCT_ID
         synonyms:
           - item_id
@@ -613,9 +617,9 @@ tables:
         expr: PRODUCT_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - Flight Management System
-          - Engine Monitoring System
-          - Weather Radar System
+          - 車両統合制御システム
+          - エンジン監視システム
+          - 複合材料パネル
     facts:
       - name: UNIT_PRICE
         synonyms:
@@ -655,9 +659,9 @@ tables:
         expr: ADDRESS
         data_type: VARCHAR(255)
         sample_values:
-          - 1 Skyview Dr
-          - 1050 Delta Blvd
-          - 100 N Riverside Plaza
+          - トヨタ町1
+          - 南青山2-1-1
+          - 港南1-7-1
       - name: BUSINESS_LINE
         synonyms:
           - business_unit
@@ -667,14 +671,15 @@ tables:
           - division
           - product_line
           - segment
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: CITY
         synonyms:
           - city_name
@@ -684,13 +689,13 @@ tables:
           - town
           - urban_area
           - urban_center
-        description: City of the customer
+        description: 顧客の所在都市
         expr: CITY
         data_type: VARCHAR(100)
         sample_values:
-          - Fort Worth
-          - Atlanta
-          - Seattle
+          - 豊田市
+          - 品川区
+          - 千代田区
       - name: CONTACT_PERSON_ID
         synonyms:
           - account_manager_id
@@ -716,11 +721,11 @@ tables:
           - state
           - territory
           - territory_name
-        description: Country of the customer
+        description: 顧客の国
         expr: COUNTRY
         data_type: VARCHAR(50)
         sample_values:
-          - USA
+          - JPN
       - name: CUSTOMER_ID
         synonyms:
           - account_id
@@ -749,9 +754,9 @@ tables:
         expr: CUSTOMER_NAME
         data_type: VARCHAR(255)
         sample_values:
-          - American Airlines
-          - Delta Air Lines
-          - Boeing Commercial Airplanes
+          - トヨタ自動車
+          - ソニーグループ
+          - 三菱ケミカル
       - name: INDUSTRY
         synonyms:
           - business_category
@@ -766,9 +771,9 @@ tables:
         expr: INDUSTRY
         data_type: VARCHAR(100)
         sample_values:
-          - Commercial Aviation
-          - Aircraft Manufacturing
-          - Defense Aerospace
+          - 自動車製造
+          - 電機製造
+          - 化学
       - name: STATE
         synonyms:
           - administrative_area
@@ -776,13 +781,13 @@ tables:
           - geographic_area
           - prefecture
           - province
-        description: State/Province of the customer
+        description: 顧客の都道府県
         expr: STATE
         data_type: VARCHAR(50)
         sample_values:
-          - TX
-          - GA
-          - WA
+          - 愛知県
+          - 東京都
+          - 大阪府
       - name: ZIP_CODE
         synonyms:
           - post_code
@@ -791,13 +796,13 @@ tables:
           - postcode
           - zip
           - zip_postal_code
-        description: Postal code of the customer
+        description: 顧客の郵便番号
         expr: ZIP_CODE
         data_type: VARCHAR(20)
         sample_values:
-          - '76155'
-          - '30354'
-          - '98101'
+          - '471-8571'
+          - '108-0075'
+          - '100-8251'
     primary_key:
       columns:
         - CUSTOMER_ID
@@ -1295,14 +1300,15 @@ tables:
           - industry_sector
           - organization_unit
           - product_line
-        description: business line (AEROSPACE, INDUSTRIAL, BUILDINGS, ENERGY)
+        description: 事業ライン (AUTOMOTIVE, ELECTRONICS, CONSTRUCTION, ENERGY, TEXTILE)
         expr: BUSINESS_LINE
         data_type: VARCHAR(15)
         sample_values:
-          - AEROSPACE
-          - INDUSTRIAL
-          - BUILDINGS
+          - AUTOMOTIVE
+          - ELECTRONICS
+          - CONSTRUCTION
           - ENERGY
+          - TEXTILE
       - name: MATERIAL_DESCRIPTION
         synonyms:
           - item_description
@@ -1315,9 +1321,9 @@ tables:
         expr: MATERIAL_DESCRIPTION
         data_type: VARCHAR(16777216)
         sample_values:
-          - High-strength aluminum alloy suitable for aerospace and automotive applications
-          - Lightweight high-strength carbon fiber reinforced polymer sheets
-          - Aerospace-grade titanium alloy with excellent strength-to-weight ratio
+          - 高強度アルミニウム合金、車体構造・シャシー部品に使用
+          - 軽量高強度の炭素繊維強化ポリマーシート、車体パネル用
+          - 高純度珪砂、ガラス繊維製造用の主原料
       - name: MATERIAL_ID
         synonyms:
           - material_id
@@ -1345,9 +1351,9 @@ tables:
         expr: MATERIAL_NAME
         data_type: VARCHAR(16777216)
         sample_values:
-          - Aluminum Alloy 6061-T6
-          - Carbon Fiber Composite
-          - Titanium Grade 5 Alloy
+          - アルミ合金 6061-T6
+          - 炭素繊維強化プラスチック
+          - 珪砂
       - name: SUPPLIER_ID
         synonyms:
           - material_supplier_id
@@ -1579,62 +1585,62 @@ relationships:
         right_column: COMPONENT_ID
     right_table: COMPONENT
 verified_queries:
-  - name: Active MFG Plants
-    question: How many active MFG plants do we have?
+  - name: 稼働中の製造工場数
+    question: 稼働中の製造工場は何拠点ありますか？
     use_as_onboarding_question: true
     sql: SELECT COUNT(*) AS active_plant_count FROM MFG_PLANT WHERE is_active = TRUE
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767188
-  - name: AEROSPACE Business Line Orders
-    question: How many orders are scheduled for the AEROSPACE business line?
+  - name: AUTOMOTIVE事業の注文数
+    question: AUTOMOTIVE事業ラインの注文は何件ありますか？
     use_as_onboarding_question: true
-    sql: SELECT COUNT(*) AS aerospace_order_count FROM orders AS o JOIN product AS p ON o.product_id = p.product_id WHERE p.business_line = 'AEROSPACE'
-    verified_by: Reid Lewis
+    sql: SELECT COUNT(*) AS automotive_order_count FROM orders AS o JOIN product AS p ON o.product_id = p.product_id WHERE p.business_line = 'AUTOMOTIVE'
+    verified_by: Admin
     verified_at: 1740767472
-  - name: Finished Goods Inventory
-    question: What's the total quantity of finished goods we have in our manufacturing plants?
+  - name: 完成品在庫
+    question: 製造工場にある完成品の総在庫数量は？
     use_as_onboarding_question: true
     sql: SELECT SUM(quantity_on_hand) AS total_finished_goods_quantity FROM mfg_inventory WHERE product_id IS NOT NULL
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767486
-  - name: Top Customers by Revenue
-    question: Who are our top 5 customers by order value?
+  - name: 売上上位顧客
+    question: 注文金額が大きい上位5社の顧客は？
     use_as_onboarding_question: true
     sql: SELECT c.customer_name, SUM(o.total_price) AS total_order_value FROM orders AS o JOIN customer AS c ON o.customer_id = c.customer_id GROUP BY c.customer_name ORDER BY total_order_value DESC LIMIT 5
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767647
-  - name: Recent Orders
-    question: How many orders did we receive in the last month?
+  - name: 直近の注文
+    question: 直近1か月で何件の注文がありましたか？
     use_as_onboarding_question: true
     sql: SELECT COUNT(*) AS order_count_last_30_days FROM orders WHERE order_date >= DATEADD(DAY, -30, CURRENT_DATE)
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767520
-  - name: Low Inventory Materials
-    question: Which raw materials at our Manufacturing Plants are running low on inventory?
+  - name: 在庫不足の原材料
+    question: 製造工場で在庫が不足している原材料はどれですか？
     use_as_onboarding_question: true
     sql: SELECT mp.mfg_plant_name, rm.material_name, mi.quantity_on_hand, mi.safety_stock_level, mi.days_forward_coverage, mi.material_lead_time FROM mfg_inventory AS mi JOIN MFG_PLANT AS mp ON mi.MFG_PLANT_ID = mp.MFG_PLANT_ID JOIN raw_material AS rm ON mi.material_id = rm.material_id WHERE mi.quantity_on_hand < mi.safety_stock_level AND mi.days_forward_coverage <= mi.material_lead_time + mi.lead_time_variability
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1741189275
-  - name: Late Shipments Analysis
-    question: How many of our shipments were late last quarter?
+  - name: 遅延出荷分析
+    question: 前四半期に遅延した出荷は何件ですか？
     use_as_onboarding_question: true
     sql: SELECT COUNT(*) AS late_shipment_count FROM shipment WHERE actual_delivery_date > expected_delivery_date AND ship_date >= DATE_TRUNC('QUARTER', CURRENT_DATE) - INTERVAL '3 MONTHS' AND ship_date < DATE_TRUNC('QUARTER', CURRENT_DATE)
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767671
-  - name: Plant Production Capacity
-    question: What is the average production capacity utilization across our manufacturing plants?
+  - name: 工場の生産能力
+    question: 各製造工場の生産品目数を教えてください
     use_as_onboarding_question: true
     sql: SELECT mp.mfg_plant_name, mp.square_footage, mp.number_of_employees, COUNT(DISTINCT mi.product_id) as products_produced FROM mfg_plant mp LEFT JOIN mfg_inventory mi ON mp.mfg_plant_id = mi.mfg_plant_id WHERE mi.product_id IS NOT NULL GROUP BY mp.mfg_plant_name, mp.square_footage, mp.number_of_employees ORDER BY products_produced DESC
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1740767692
-  - name: Material Transfer Cost Analysis
-    question: For plants with low inventory, what would it cost to transfer materials from plants with excess inventory versus purchasing new materials?
+  - name: 資材移送コスト分析
+    question: 在庫不足の工場に対して、余剰在庫のある工場から資材を移送する場合のコストと新規購入コストの比較は？
     use_as_onboarding_question: false
     sql: WITH low_inventory AS (SELECT mi.mfg_plant_id AS low_plant_id, mp.mfg_plant_name AS low_plant_name, mi.material_id, rm.material_name, mi.quantity_on_hand AS low_qty, mi.replenishment_point, (mi.replenishment_point - mi.quantity_on_hand) AS units_needed, rm.material_cost, rm.plant_transport_cost FROM mfg_inventory AS mi JOIN mfg_plant AS mp ON mi.mfg_plant_id = mp.mfg_plant_id JOIN raw_material AS rm ON mi.material_id = rm.material_id WHERE mi.quantity_on_hand < mi.safety_stock_level AND mi.days_forward_coverage <= mi.material_lead_time + mi.lead_time_variability), excess_inventory AS (SELECT mi.mfg_plant_id AS excess_plant_id, mp.mfg_plant_name AS excess_plant_name, mi.material_id, mi.quantity_on_hand AS excess_qty, mi.replenishment_point AS excess_replenishment_point, (mi.quantity_on_hand - mi.replenishment_point) AS available_to_transfer FROM mfg_inventory AS mi JOIN mfg_plant AS mp ON mi.mfg_plant_id = mp.mfg_plant_id WHERE mi.quantity_on_hand > 3 * mi.safety_stock_level AND mi.days_forward_coverage > 2 * mi.material_lead_time) SELECT l.low_plant_name, l.material_name, l.units_needed, l.material_cost * l.units_needed AS supplier_purchase_cost, e.excess_plant_name, LEAST(l.units_needed, e.available_to_transfer) AS transferrable_units, l.plant_transport_cost * LEAST(l.units_needed, e.available_to_transfer) * tcs.transport_cost_surcharge AS transfer_cost FROM low_inventory AS l LEFT JOIN excess_inventory AS e ON l.material_id = e.material_id LEFT JOIN transport_cost_surcharge AS tcs ON e.excess_plant_id = tcs.source_facility_id AND l.low_plant_id = tcs.destination_facility_id ORDER BY l.low_plant_name, l.material_name
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1741191526
-  - name: Show me the material names and their lead times for materials containing 'steel' or 'copper' in their names
-    question: Show me the material names and their lead times for materials containing 'steel' or 'copper' in their names
+  - name: ガラス繊維・アルミ合金の材料リードタイム
+    question: ガラスまたはアルミを含む原材料名とそのリードタイムを表示してください
     sql: |-
       SELECT
         DISTINCT r.material_name,
@@ -1643,38 +1649,44 @@ verified_queries:
         mfg_inventory AS i
         LEFT OUTER JOIN raw_material AS r ON i.material_id = r.material_id
       WHERE
-        LOWER(r.material_name) LIKE '%steel%'
-        OR LOWER(r.material_name) LIKE '%copper%'
+        r.material_name LIKE '%ガラス%'
+        OR r.material_name LIKE '%アルミ%'
       ORDER BY
         r.material_name
     use_as_onboarding_question: false
-    verified_by: Reid Lewis
+    verified_by: Admin
     verified_at: 1760015223
+  - name: TEXTILE事業の製造工場一覧
+    question: TEXTILE事業の製造工場一覧を教えてください
+    use_as_onboarding_question: true
+    sql: SELECT mfg_plant_name, city, state, number_of_employees FROM mfg_plant WHERE business_line = 'TEXTILE' ORDER BY number_of_employees DESC
+    verified_by: Admin
+    verified_at: 1760015300
 module_custom_instructions:
   question_categorization: |+
-    If a user mentions terms like 'airplane,' 'avionics,' 'flight,' or 'aircraft,' they are likely referring to the AEROSPACE business line. Terms like 'factory,' 'PLC,' 'process control,' or 'manufacturing' likely refer to INDUSTRIAL. 'Thermostat,' 'HVAC,' 'building management,' or 'climate control' usually refer to BUILDINGS. 'Energy,' 'solar,' 'wind,' 'battery,' or 'sustainability' generally refer to ENERGY.
+    ユーザーが「自動車」「車両」「EV」「シャシー」などの用語を使用した場合、AUTOMOTIVE事業ラインを指している可能性が高いです。「半導体」「回路」「基板」「センサー」などはELECTRONICSを指します。「建設」「ビル」「建材」「空調」はCONSTRUCTIONを指します。「エネルギー」「太陽光」「風力」「蓄電池」はENERGYを指します。「繊維」「ガラス繊維」「複合材料」「織物」「紡績」はTEXTILEを指します。
 
-    Manufacturing plant inventory (MFG_INVENTORY) can contain three types of items:
-    1. Raw materials (material_id populated) - sourced from suppliers
-    2. Components (component_id populated) - manufactured from raw materials  
-    3. Finished products (product_id populated) - assembled from components, sold directly to customers
+    製造工場の在庫（MFG_INVENTORY）には3種類のアイテムが含まれます：
+    1. 原材料（material_idが設定）- サプライヤーから調達
+    2. 部品（component_idが設定）- 原材料から製造
+    3. 完成品（product_idが設定）- 部品から組立、顧客に直接販売
 
-    When a user asks about 'inventory,' consider the context:
-    - At manufacturing plants: could mean raw materials, components, or finished products
-    - If unspecified, assume they want all inventory types unless context suggests otherwise
-    - 'Raw materials' = materials sourced from suppliers
-    - 'Components' = parts manufactured in-house
-    - 'Finished goods/products' = final products sold to customers
+    ユーザーが「在庫」について質問した場合、コンテキストを考慮してください：
+    - 製造工場では：原材料、部品、完成品のいずれかを意味する可能性があります
+    - 指定がない場合、コンテキストから判断できない限り全種類の在庫を想定
+    - 「原材料」= サプライヤーから調達する材料
+    - 「部品」= 自社製造のパーツ
+    - 「完成品／製品」= 顧客に販売する最終製品
 
   sql_generation: |-
-    Unless explicitly specified otherwise, assume users are asking about current data, not historical data. For example, 'inventory levels' should refer to the current `quantity_on_hand`, not past inventory.
+    特に指定がない限り、ユーザーは現在のデータについて質問していると想定してください。例えば「在庫レベル」は現在の`quantity_on_hand`を指します。
 
-    The 'business_line' column is crucial. Many queries will implicitly or explicitly refer to one of the four business lines: AEROSPACE, INDUSTRIAL, BUILDINGS, and ENERGY. Pay close attention to this.
+    'business_line'カラムは重要です。多くのクエリは暗黙的または明示的に5つの事業ライン（AUTOMOTIVE、ELECTRONICS、CONSTRUCTION、ENERGY、TEXTILE）のいずれかを参照します。注意してください。
 
-    The supply chain flow is: Suppliers → Manufacturing Plants → Customers (direct sales only).
+    サプライチェーンの流れ：サプライヤー → 製造工場 → 顧客（直接販売のみ）
 
-    We now have detailed supplier information in the SUPPLIERS table, which includes contact details, business lines, and preferred supplier status. Raw materials are linked to their primary suppliers.
+    SUPPLIERSテーブルには詳細なサプライヤー情報（連絡先、事業ライン、優先サプライヤーステータス）が含まれています。原材料は主要サプライヤーにリンクされています。
 
-    The BILL_OF_MATERIALS table shows the detailed breakdown of what raw materials and components are needed to manufacture each product or component, including quantities, units of measure, and scrap factors.
+    BILL_OF_MATERIALSテーブルは各製品・部品の製造に必要な原材料と部品の詳細な構成（数量、単位、スクラップ率）を示しています。
 
-    For material transfer analysis, users may ask about transferring raw materials from manufacturing plants with excess inventory to those with shortages. Compare the cost of purchasing new materials versus transferring existing materials between plants, factoring in transport_cost_surcharge.
+    資材移送分析では、余剰在庫のある製造工場から不足している工場への原材料移送コストと新規購入コストの比較について質問される場合があります。transport_cost_surchargeを考慮してください。
