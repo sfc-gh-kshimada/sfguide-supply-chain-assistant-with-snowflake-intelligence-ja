@@ -228,8 +228,8 @@ ALTER WAREHOUSE SUPPLY_CHAIN_ASSISTANT_WH SET WAREHOUSE_SIZE = 'SMALL';
 1. Snowsight の左側ナビゲーションバーの **AI & ML** セクション内の **Agents** をクリック
 2. **Create Agent** ボタンをクリック
 3. 以下を設定：
-   * **Database:** `SNOWFLAKE_INTELLIGENCE`
-   * **Schema:** `AGENTS`
+   * **Database:** `SUPPLY_CHAIN_ASSISTANT_DB`
+   * **Schema:** `ENTITIES`
    * **Agent object name:** `Supply_Chain_Agent`
    * **Display name:** Supply Chain Agent
 4. 作成後、**Tools** タブに移動
