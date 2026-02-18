@@ -3771,33 +3771,57 @@ HANDLER = 'main'
 EXECUTE AS OWNER
 AS '
 import markdown
+import re
+
+def preprocess_japanese_text(text: str) -> str:
+    lines = text.split(''\n'')
+    result = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            result.append('''')
+            continue
+        if re.match(r''^[━─═]{3,}'', stripped):
+            result.append(''<hr style="border:none;border-top:2px solid #29b5e8;margin:20px 0;">'')
+            continue
+        m = re.match(r''^【(.+?)】(.*)$'', stripped)
+        if m:
+            title = m.group(1)
+            rest = m.group(2).strip()
+            result.append(f''### {title}'')
+            if rest:
+                result.append(rest)
+            continue
+        if stripped.startswith(''▼ '') or stripped.startswith(''▼''):
+            content = stripped.lstrip(''▼ '').lstrip(''▼'').strip()
+            result.append(f''**{content}**'')
+            continue
+        if stripped.startswith(''□ '') or stripped.startswith(''□''):
+            content = stripped.lstrip(''□ '').lstrip(''□'').strip()
+            result.append(f''- ☐ {content}'')
+            continue
+        if re.match(r''^\d+\.\s'', stripped):
+            result.append(stripped)
+            continue
+        if stripped.startswith(''- ''):
+            result.append(f''&nbsp;&nbsp;&nbsp;&nbsp;{stripped}'')
+            continue
+        result.append(stripped)
+    processed = ''\n''.join(result)
+    processed = re.sub(r''\n{3,}'', ''\n\n'', processed)
+    return processed
 
 def main(session, subject: str, body_markdown: str) -> str:
-    """
-    Converts a subject and markdown text into a responsive, well-formatted HTML email.
+    preprocessed = preprocess_japanese_text(body_markdown)
+    html_content = markdown.markdown(preprocessed, extensions=[''tables'', ''nl2br'', ''sane_lists''])
 
-    Args:
-        session: The Snowflake session object.
-        subject: The subject line of the email, also used as the main title.
-        body_markdown: The content of the email in Markdown format.
-
-    Returns:
-        A string containing the full HTML for the email.
-    """
-    # --- 1. Convert the main body from Markdown to HTML ---
-    # The ''tables'' extension allows for the conversion of Markdown tables.
-    html_content = markdown.markdown(body_markdown, extensions=[''tables''])
-
-    # --- 2. Define Inline CSS Styles for Email Client Compatibility ---
-    # Using inline styles is a best practice for HTML emails as many clients
-    # strip <style> tags and external stylesheets.
     styles = {
-        "body": "font-family: -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif, ''Apple Color Emoji'', ''Segoe UI Emoji'', ''Segoe UI Symbol''; background-color: #f4f7f6; margin: 0; padding: 0;",
+        "body": "font-family: -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, ''Hiragino Sans'', ''Yu Gothic'', ''Meiryo'', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0;",
         "wrapper": "width: 100%; table-layout: fixed; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;",
         "outer_table": "margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; font-family: sans-serif; color: #333333;",
         "main_content": "background-color: #ffffff; padding: 20px 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);",
-        "header": "font-size: 28px; font-weight: bold; color: #0d172b; padding-bottom: 20px; text-align: center; border-bottom: 1px solid #e0e0e0;",
-        "content_body": "font-size: 16px; line-height: 1.6; color: #3d4c5c; padding-top: 20px;",
+        "header": "font-size: 24px; font-weight: bold; color: #0d172b; padding-bottom: 20px; text-align: center; border-bottom: 2px solid #29b5e8;",
+        "content_body": "font-size: 15px; line-height: 1.8; color: #3d4c5c; padding-top: 20px;",
         "footer": "text-align: center; padding: 20px; font-size: 12px; color: #888888;",
         "button": "background-color: #29b5e8; color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; display: inline-block; font-weight: bold;",
         "table": "width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;",
@@ -3805,8 +3829,6 @@ def main(session, subject: str, body_markdown: str) -> str:
         "td": "border: 1px solid #dddddd; text-align: left; padding: 8px;"
     }
 
-    # --- 3. Construct the Full HTML Document using an f-string ---
-    # The structure uses tables for layout to ensure maximum compatibility with older email clients like Outlook.
     html_template = f"""
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -3816,15 +3838,17 @@ def main(session, subject: str, body_markdown: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{subject}</title>
   <style type="text/css">
-      /* Basic styles for HTML elements converted from markdown */
       table {{ {styles[''table'']} }}
       th {{ {styles[''th'']} }}
       td {{ {styles[''td'']} }}
-      h1, h2, h3 {{ color: #0d172b; }}
-      p {{ margin: 0 0 1em 0; }}
+      h1, h2 {{ color: #0d172b; margin-top: 1.5em; }}
+      h3 {{ color: #0d172b; background-color: #f0f7ff; padding: 10px 15px; border-left: 4px solid #29b5e8; margin-top: 1.5em; margin-bottom: 0.8em; font-size: 16px; }}
+      p {{ margin: 0 0 0.8em 0; }}
       a {{ color: #29b5e8; text-decoration: underline; }}
       ul, ol {{ padding-left: 20px; margin-bottom: 1em; }}
       li {{ margin-bottom: 0.5em; }}
+      hr {{ border: none; border-top: 2px solid #29b5e8; margin: 20px 0; }}
+      strong {{ color: #0d172b; }}
   </style>
 </head>
 <body style="{styles[''body'']}">
@@ -3840,9 +3864,6 @@ def main(session, subject: str, body_markdown: str) -> str:
                 </div>
                 <div class="content-body" style="{styles[''content_body'']}">
                   {html_content}
-                  <p style="text-align:center; padding-top: 25px;">
-                      <a href="#" style="{styles[''button'']}">Call to Action</a>
-                  </p>
                 </div>
               </td>
             </tr>
@@ -3851,9 +3872,8 @@ def main(session, subject: str, body_markdown: str) -> str:
       </tr>
       <tr>
         <td class="footer" style="{styles[''footer'']}">
-          Snowflake Inc. &copy; 2025<br>
-          125 Constitution Dr, Menlo Park, CA 94025<br>
-          <a href="#" style="color: #888888;">Unsubscribe</a>
+          Powered by Snowflake Intelligence<br>
+          <a href="#" style="color: #888888;">配信停止</a>
         </td>
       </tr>
     </table>
