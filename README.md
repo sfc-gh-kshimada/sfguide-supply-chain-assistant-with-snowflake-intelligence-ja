@@ -90,14 +90,22 @@ Snowflake Intelligence は、Snowflake 内でAIエージェントを構築・デ
 * Cortex 機能が有効化された Snowflake アカウント。Snowflake アカウントをお持ちでない場合は、[無料トライアルに登録](https://signup.snowflake.com/)できます。
 * ACCOUNTADMIN ロール、またはデータベース、スキーマ、テーブル、ステージ、Cortex Search サービスを作成できるロールを持つ Snowflake アカウントログイン。
 * Cortex Analyst、Cortex Search、Snowflake Intelligence が Snowflake リージョンで利用可能であること。
+* Snowflake SQL と Snowsight インターフェースの基本的な知識。
+
+> **注意：** Web検索とWebスクレイピング用のカスタムツールは外部統合アクセスが必要であり、トライアルアカウントでは利用できません。これらのツールのセットアップステップをスキップしても、クイックスタートの他の部分は完了できます。
 
 ---
 
 ## ステップ 1 - データベースのセットアップとデータのロード
 
-1. Snowsight で新しいワークシートを開く
-2. **scripts/setup.sql** ファイルをインポート
-3. すべて実行（Run All）
+このステップでは、必要なすべてのテーブル、ステージ、サンプルデータを含むサプライチェーンデータベースインフラストラクチャを作成します。
+
+データベースは、サプライヤー、製造工場、顧客を含む多層サプライチェーンネットワークをモデル化します。デモでは在庫レベル、需要、安全在庫、リードタイムのばらつき、コストなどの主要な運用要素を考慮します。
+
+1. Snowsight で **Projects > Workspaces** に移動し、新しいプライベートワークスペースを作成
+2. ワークスペースに新しい SQL ファイルを追加
+3. リポジトリの **scripts/setup.sql** ファイルをインポート
+4. **Run All** をクリックしてスクリプト全体を実行
 
 このスクリプトにより以下が作成されます：
 
@@ -106,18 +114,30 @@ Snowflake Intelligence は、Snowflake 内でAIエージェントを構築・デ
 * すべてのサプライチェーンテーブル（サプライヤー、工場、在庫、注文など）
 * PDF とセマンティックモデル用の内部ステージ
 * INSERT 文によるサンプルデータのロード
+* カスタム関数とプロシージャ（Web検索、Webスクレイピング、メール、HTMLニュースレター生成機能）
 
 ## ステップ 2 - ドキュメントとセマンティックモデルのアップロード
 
-最初のステップで、すべてのオブジェクトが SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES データベース/スキーマに作成されています。
-2つの内部ステージを作成したので、ここでファイルをアップロードします。
+最初のステップで、すべてのオブジェクトが `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES` データベース/スキーマに作成されています。2つの内部ステージを作成したので、ここでファイルをアップロードします。
 
-1. 左側メニューの **Horizon Catalog** から **データベースエクスプローラー** に移動
-2. SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES データベース/スキーマに移動し、**Stages** を選択
-3. **SUPPLY_CHAIN_ASSISTANT_PDF_STAGE** ステージで、右上の **+ Files** ボタンを使用して **pdfs/Supply Chain Network Overview.pdf**（または日本語版 **pdfs/Supply Chain Network Overview.md**）ファイルをアップロード
-4. **SEMANTIC_MODELS_STAGE** ステージで、両方のセマンティックモデルファイルをアップロード：
+### PDF ドキュメントのアップロード
+
+1. 左側メニューの **Catalog** から **データベースエクスプローラー** に移動
+2. `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES` データベース/スキーマに移動
+3. **Stages** をクリックして利用可能なステージを表示
+4. **SUPPLY_CHAIN_ASSISTANT_PDF_STAGE** ステージを選択
+5. 右上の **+ Files** ボタンをクリック
+6. **pdfs/Supply Chain Network Overview.pdf**（または日本語版 **pdfs/Supply Chain Network Overview.md**）ファイルをアップロード
+
+### セマンティックモデルファイルのアップロード
+
+1. 同じ Stages ビューで **SEMANTIC_MODELS_STAGE** ステージを選択
+2. **+ Files** ボタンをクリック
+3. 両方のセマンティックモデルファイルをアップロード：
    * **scripts/semantic_models/SUPPLY_CHAIN_ASSISTANT_MODEL.yaml**
    * **scripts/semantic_models/WEATHER_FORECAST.yaml**
+
+これらのセマンティックモデルは、Cortex Analyst がサプライチェーンデータと天候データに関する自然言語の質問に回答するために使用する構造、リレーションシップ、検証済みクエリを定義しています。
 
 ## ステップ 3 - Cortex Search サービスの作成
 
@@ -125,17 +145,17 @@ Cortex Search サービスの作成には2つの方法があります：
 
 ### オプション A：SQL スクリプトを使用
 
-1. Snowsight で新しいワークシートを開く
+1. ワークスペースに新しい SQL ファイルを追加
 2. **scripts/configure_search_services.sql** ファイルをインポート
-3. すべて実行（Run All）
+3. **Run All** をクリックしてスクリプト全体を実行
 
 このスクリプトは以下を行います：
 
-* Cortex PARSE_DOCUMENT を使用して PDF を解析
-* コンテンツを検索可能なセグメントにチャンク分割
+* Cortex PARSE_DOCUMENT 関数を使用して PDF を解析
+* 再帰的文字分割によりコンテンツを検索可能なセグメントにチャンク分割
 * 事前署名付き URL を持つ `PARSED_PDFS` テーブルを作成
 * `SUPPLY_CHAIN_INFO` Cortex Search サービスを作成
-* 事前署名付き URL を毎日更新するタスクをセットアップ
+* 事前署名付き URL を毎日更新するタスクをセットアップ（7日で期限切れのため）
 
 ### オプション B：Snowsight UI から手動作成
 
@@ -182,95 +202,135 @@ ALTER WAREHOUSE SUPPLY_CHAIN_ASSISTANT_WH SET WAREHOUSE_SIZE = 'SMALL';
 #### ステップ 3.2：UI から検索サービスを作成
 
 1. Snowsight で、左側ナビゲーションの **AI & ML** > **Cortex Search** に移動
-2. **+ Search Service** ボタンをクリック
+2. **Create** ボタンをクリック
 3. 検索サービスを設定：
-   * **Name:** `SUPPLY_CHAIN_INFO`
    * **Database:** `SUPPLY_CHAIN_ASSISTANT_DB`
    * **Schema:** `ENTITIES`
-   * **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
-   * **Source Table:** `PARSED_PDFS`
+   * **Name:** `SUPPLY_CHAIN_INFO`
+   * **Source Table to be Indexed:** `PARSED_PDFS`
    * **Search Column:** `PAGE_CONTENT` を選択
+   * **Attributes:** **Next** をクリック
+   * **Select Columns:** `TITLE` を選択
    * **Target Lag:** `1 hour`
+   * **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
 4. **Create Search Service** をクリック
+
+検索サービスが解析済みPDFコンテンツのインデックス作成を開始します。インデックス作成が完了すると、セマンティック検索クエリに利用可能になります。
 
 ## ステップ 4 - Snowflake Intelligence エージェントの作成
 
-セマンティックモデルと検索サービスが作成されたので、Snowflake Intelligence を使用してインテリジェントエージェントに統合できます。
+セマンティックモデルと検索サービスが作成されたので、Snowflake Intelligence を使用してインテリジェントエージェントに統合できます。エージェントはユーザーの質問の性質に基づいて、適切なツールにインテリジェントにルーティングします。
 
-1. Snowsight の左側ナビゲーションバーの AI & ML セクション内の **Agents** をクリック
-2. **Create Agent** をクリックし、名前を **Supply_Chain_Agent** とする
-3. 作成後、**Edit** をクリックし、左側の **Tools** に移動
+### エージェントの作成
+
+> Snowsight で **SUPPLY_CHAIN_ASSISTANT_ROLE** ロールを使用していることを確認してください。
+
+1. Snowsight の左側ナビゲーションバーの **AI & ML** セクション内の **Agents** をクリック
+2. **Create Agent** ボタンをクリック
+3. 以下を設定：
+   * **Database:** `SNOWFLAKE_INTELLIGENCE`
+   * **Schema:** `AGENTS`
+   * **Agent object name:** `Supply_Chain_Agent`
+   * **Display name:** Supply Chain Agent
+4. 作成後、**Tools** タブに移動
 
 ### 最初の Cortex Analyst ツールの追加 - サプライチェーンデータ
 
-1. **Add Tool** をクリックし、**Cortex Analyst** を選択
-2. 名前を **SUPPLY_CHAIN_ASSISTANT_MODEL** とする
-3. **Semantic Model File** をクリックし、以下に移動：
-   * Database: `SUPPLY_CHAIN_ASSISTANT_DB`
-   * Schema: `ENTITIES`
-   * Stage: `SEMANTIC_MODELS_STAGE`
-   * File: `SUPPLY_CHAIN_ASSISTANT_MODEL.yaml`
-4. ウェアハウスを選択：`SUPPLY_CHAIN_ASSISTANT_WH`
-5. ツールの説明を追加：*"サプライチェーンデータを分析するツール。"*
+1. **Cortex Analyst** の横にある **+ Add** をクリック
+2. ツールを設定：
+   * **Semantic model file** ラジオボタンを選択
+   * **Database:** `SUPPLY_CHAIN_ASSISTANT_DB`
+   * **Schema:** `ENTITIES`
+   * **Stage:** `SEMANTIC_MODELS_STAGE`
+   * `SUPPLY_CHAIN_ASSISTANT_MODEL.yaml` を選択
+   * **Name:** `SUPPLY_CHAIN_ASSISTANT_MODEL`
+   * **Description:** *"Tool for analyzing supply chain data."*
+   * **Warehouse:** **Custom** ラジオボタンを選択し、`SUPPLY_CHAIN_ASSISTANT_WH` を選択
+3. **Save** をクリック
 
 ### 2番目の Cortex Analyst ツールの追加 - 天候データ
 
-1. **Add Tool** をクリックし、**Cortex Analyst** を選択
-2. 名前を **WEATHER_FORECAST** とする
-3. **Semantic Model File** をクリックし、以下に移動：
-   * Database: `SUPPLY_CHAIN_ASSISTANT_DB`
-   * Schema: `WEATHER`
-   * Stage: `SEMANTIC_MODELS_STAGE`
-   * File: `WEATHER_FORECAST.yaml`
-4. ウェアハウスを選択：`SUPPLY_CHAIN_ASSISTANT_WH`
-5. ツールの説明を追加：*"天候データを分析するツール。"*
+1. **Cortex Analyst** の横にある **+ Add** をクリック
+2. ツールを設定：
+   * **Semantic model file** ラジオボタンを選択
+   * **Database:** `SUPPLY_CHAIN_ASSISTANT_DB`
+   * **Schema:** `ENTITIES`
+   * **Stage:** `SEMANTIC_MODELS_STAGE`
+   * `WEATHER_FORECAST.yaml` を選択
+   * **Name:** `WEATHER_FORECAST`
+   * **Description:** *"Tool for analyzing weather data."*
+   * **Warehouse:** **Custom** ラジオボタンを選択し、`SUPPLY_CHAIN_ASSISTANT_WH` を選択
+3. **Save** をクリック
 
 ### Cortex Search ツールの追加
 
-1. **Add Tool** をクリックし、**Cortex Search** を選択
-2. 名前を **SUPPLY_CHAIN_INFO** とする
-3. ツールの説明を追加：*"サプライチェーンの非構造化データを検索するツール。"*
-4. 検索サービスを選択：`SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES.SUPPLY_CHAIN_INFO`
-5. **PAGE_URL** を ID 列、**TITLE** を Title 列として設定
+1. **Cortex Search Services** の横にある **+ Add** をクリック
+2. ツールを設定：
+   * **Database:** `SUPPLY_CHAIN_ASSISTANT_DB`
+   * **Schema:** `ENTITIES`
+   * **Search Service:** `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES.SUPPLY_CHAIN_INFO` を選択
+   * **Name:** `SUPPLY_CHAIN_INFO`
+   * **Description:** *"Tool for searching supply chain unstructured data."*
+   * **ID Column:** `PAGE_URL`
+   * **Title Column:** `TITLE`
+3. **Save** をクリック
 
 ### カスタムツールの追加
 
-以下の各カスタムツールについて、**Add Tool** をクリックし **Custom Tool** を選択してから設定します：
+> **注意：** WEB_SEARCH と WEB_SCRAPE カスタムツールは外部統合アクセスが必要であり、トライアルアカウントでは利用できません。トライアルアカウントを使用している場合は、これら2つのツールの追加をスキップしても他のエージェント機能は使用できます。
+
+以下の各カスタムツールについて、**Custom Tool** の横にある **+ Add** をクリックしてから設定します：
 
 #### 1. CREATE_HTML_NEWSLETTER
 
-* Type: Stored Procedure
-* Schema: `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
-* Name: `CREATE_HTML_NEWSLETTER_SP`
-* Description: *"レスポンスから HTML ニュースレターを作成。"*
+* **Type:** procedure
+* **Schema:** `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
+* **Custom tool identifier:** `CREATE_HTML_NEWSLETTER_SP`
+* **Name:** `CREATE_HTML_NEWSLETTER_SP`
+* **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
+* **Description:** *"Create HTML newsletter from responses."*
 
 #### 2. WEB_SEARCH
 
-* Type: Function
-* Schema: `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
-* Name: `WEB_SEARCH`
-* Description: *"DuckDuckGo を使用した Web 検索。"*
+* **Type:** function
+* **Schema:** `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
+* **Custom tool identifier:** `WEB_SEARCH`
+* **Name:** `WEB_SEARCH`
+* **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
+* **Description:** *"Search the web using DuckDuckGo."*
 
 #### 3. WEB_SCRAPE
 
-* Type: Function
-* Schema: `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
-* Name: `WEB_SCRAPE`
-* Description: *"Web スクレイピングとコンテンツ抽出。"*
+* **Type:** function
+* **Schema:** `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
+* **Custom tool identifier:** `WEB_SCRAPE`
+* **Name:** `WEB_SCRAPE`
+* **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
+* **Description:** *"Web scraping and content extraction."*
 
-#### 4. Send_Emails（オプション - 認証済みメールアドレスが必要）
+#### 4. SEND_MAIL（オプション - 認証済みメールアドレスが必要）
 
-* Type: Stored Procedure
-* Schema: `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
-* Name: `SEND_MAIL`
-* Description: *"HTML 形式のコンテンツで受信者にメールを送信。"*
+* **Type:** procedure
+* **Schema:** `SUPPLY_CHAIN_ASSISTANT_DB.ENTITIES`
+* **Custom tool identifier:** `SEND_MAIL`
+* **Name:** `SEND_MAIL`
+* **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
+* **Description:** *"Send emails to recipients with HTML formatted content."*
 
 ### エージェントの保存とテスト
 
 1. **Save** をクリックしてエージェント設定を保存
-2. 右側のペインで直接エージェントのテストを開始、**または** 左側ナビゲーションの AI & ML メニューで **Snowflake Intelligence** に移動
-3. ドロップダウンからエージェントを選択
-4. 質問を始めましょう！
+2. 右側のペインで直接エージェントのテストを開始できます
+
+### Snowflake Intelligence への公開
+
+エージェントを Snowflake Intelligence で利用可能にするには、以下の手順が必要です：
+
+1. 作成したエージェントのページで **Overview** タブに移動
+2. **Snowflake Intelligence** セクションにある **Add to Snowflake Intelligence** ボタンをクリック
+3. 左側ナビゲーションの **AI & ML** メニューで **Snowflake Intelligence** に移動
+4. ドロップダウンからエージェントを選択
+5. 質問を始めましょう！
 
 ## ステップ 5 - サンプル質問を試す
 
