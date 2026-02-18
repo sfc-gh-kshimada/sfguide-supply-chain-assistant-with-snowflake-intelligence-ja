@@ -317,6 +317,12 @@ ALTER WAREHOUSE SUPPLY_CHAIN_ASSISTANT_WH SET WAREHOUSE_SIZE = 'SMALL';
 * **Warehouse:** `SUPPLY_CHAIN_ASSISTANT_WH`
 * **Description:** *"Send emails to recipients with HTML formatted content."*
 
+### Orchestration の設定
+
+エージェントの **Orchestration** タブで、以下の指示を追加してください。これにより、メール送信時にエージェントが適切にフォーマットされたHTMLメールを生成します：
+
+> send_mailを実行する際にはまずMarkdownフォーマットで本文を作成し、それをHTMLに変換して送信してください。
+
 ### エージェントの保存とテスト
 
 1. **Save** をクリックしてエージェント設定を保存
