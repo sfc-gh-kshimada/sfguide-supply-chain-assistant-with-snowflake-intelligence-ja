@@ -3769,68 +3769,70 @@ RUNTIME_VERSION = '3.9'
 PACKAGES = ('snowflake-snowpark-python','markdown')
 HANDLER = 'main'
 EXECUTE AS OWNER
-AS '
+AS $$
 import markdown
 import re
 
-def preprocess_japanese_text(text: str) -> str:
-    lines = text.split(''\\n'')
+def inject_linebreaks(text):
+    """Insert newlines before Japanese formatting markers when text lacks them."""
+    if '\n' in text and len(text.split('\n')) > 3:
+        return text
+
+    t = text
+    t = re.sub(r'([━─═]{3,})', r'\n\1\n', t)
+    t = re.sub(r'【', r'\n【', t)
+    t = re.sub(r'】', r'】\n', t)
+    t = re.sub(r'(?<=[。！？\n])▼', r'\n▼', t)
+    t = re.sub(r'(?<!\n)▼\s', r'\n▼ ', t)
+    t = re.sub(r'(?<=[。！？\n])□', r'\n□', t)
+    t = re.sub(r'(?<!\n)□\s', r'\n□ ', t)
+    t = re.sub(r'(?<=[\s。！？])(\d+)\.\s', r'\n\1. ', t)
+    t = re.sub(r'(?<=[\s。）\)])- ', r'\n- ', t)
+    t = re.sub(r'(?<=[。！？])([^━─═▼□【\d\n])', r'\n\1', t)
+    t = re.sub(r'\n{3,}', r'\n\n', t)
+    return t.strip()
+
+def lines_to_markdown(text):
+    """Convert Japanese-formatted lines into Markdown."""
+    lines = text.split('\n')
     result = []
     for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            result.append('''')
+        s = line.strip()
+        if not s:
+            result.append('')
             continue
-        if re.match(r''^[━─═]{3,}'', stripped):
-            result.append(''<hr style="border:none;border-top:2px solid #29b5e8;margin:20px 0;">'')
+        if re.match(r'^[━─═]{3,}', s):
+            result.append('\n---\n')
             continue
-        m = re.match(r''^【(.+?)】(.*)$'', stripped)
+        m = re.match(r'^【(.+?)】(.*)$', s)
         if m:
-            title = m.group(1)
-            rest = m.group(2).strip()
-            result.append(f''### {title}'')
-            if rest:
-                result.append(rest)
+            result.append(f'\n### {m.group(1)}\n')
+            if m.group(2).strip():
+                result.append(m.group(2).strip())
             continue
-        if stripped.startswith(''▼ '') or stripped.startswith(''▼''):
-            content = stripped.lstrip(''▼ '').lstrip(''▼'').strip()
-            result.append(f''**{content}**'')
+        if s.startswith('▼'):
+            content = s.lstrip('▼').strip()
+            result.append(f'\n**{content}**\n')
             continue
-        if stripped.startswith(''□ '') or stripped.startswith(''□''):
-            content = stripped.lstrip(''□ '').lstrip(''□'').strip()
-            result.append(f''- ☐ {content}'')
+        if s.startswith('□'):
+            content = s.lstrip('□').strip()
+            result.append(f'- ☐ {content}')
             continue
-        if re.match(r''^\d+\.\s'', stripped):
-            result.append(stripped)
+        if re.match(r'^\d+\.\s', s):
+            result.append(s)
             continue
-        if stripped.startswith(''- ''):
-            result.append(f''&nbsp;&nbsp;&nbsp;&nbsp;{stripped}'')
+        if s.startswith('- '):
+            result.append(f'  {s}')
             continue
-        result.append(stripped)
-    processed = ''\\n''.join(result)
-    processed = re.sub(r''\\n{3,}'', ''\\n\\n'', processed)
-    return processed
+        result.append(s)
+    return '\n'.join(result)
 
 def main(session, subject: str, body_markdown: str) -> str:
-    preprocessed = preprocess_japanese_text(body_markdown)
-    html_content = markdown.markdown(preprocessed, extensions=[''tables'', ''nl2br'', ''sane_lists''])
+    injected = inject_linebreaks(body_markdown)
+    preprocessed = lines_to_markdown(injected)
+    html_content = markdown.markdown(preprocessed, extensions=['tables', 'nl2br', 'sane_lists'])
 
-    styles = {
-        "body": "font-family: -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, ''Hiragino Sans'', ''Yu Gothic'', ''Meiryo'', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0;",
-        "wrapper": "width: 100%; table-layout: fixed; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;",
-        "outer_table": "margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; font-family: sans-serif; color: #333333;",
-        "main_content": "background-color: #ffffff; padding: 20px 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);",
-        "header": "font-size: 24px; font-weight: bold; color: #0d172b; padding-bottom: 20px; text-align: center; border-bottom: 2px solid #29b5e8;",
-        "content_body": "font-size: 15px; line-height: 1.8; color: #3d4c5c; padding-top: 20px;",
-        "footer": "text-align: center; padding: 20px; font-size: 12px; color: #888888;",
-        "button": "background-color: #29b5e8; color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; display: inline-block; font-weight: bold;",
-        "table": "width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;",
-        "th": "border: 1px solid #dddddd; text-align: left; padding: 8px; background-color: #f2f2f2;",
-        "td": "border: 1px solid #dddddd; text-align: left; padding: 8px;"
-    }
-
-    html_template = f"""
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    html_template = f"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -3838,9 +3840,10 @@ def main(session, subject: str, body_markdown: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{subject}</title>
   <style type="text/css">
-      table {{ {styles[''table'']} }}
-      th {{ {styles[''th'']} }}
-      td {{ {styles[''td'']} }}
+      body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }}
+      table {{ width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; }}
+      th {{ border: 1px solid #ddd; text-align: left; padding: 8px; background-color: #f2f2f2; }}
+      td {{ border: 1px solid #ddd; text-align: left; padding: 8px; }}
       h1, h2 {{ color: #0d172b; margin-top: 1.5em; }}
       h3 {{ color: #0d172b; background-color: #f0f7ff; padding: 10px 15px; border-left: 4px solid #29b5e8; margin-top: 1.5em; margin-bottom: 0.8em; font-size: 16px; }}
       p {{ margin: 0 0 0.8em 0; }}
@@ -3851,18 +3854,18 @@ def main(session, subject: str, body_markdown: str) -> str:
       strong {{ color: #0d172b; }}
   </style>
 </head>
-<body style="{styles[''body'']}">
-  <center class="wrapper" style="{styles[''wrapper'']}">
-    <table class="outer" align="center" style="{styles[''outer_table'']}">
+<body>
+  <center style="width:100%;table-layout:fixed;">
+    <table align="center" style="margin:0 auto;width:100%;max-width:600px;border-spacing:0;color:#333;">
       <tr>
-        <td style="padding: 20px;">
-          <table width="100%" style="border-spacing: 0;">
+        <td style="padding:20px;">
+          <table width="100%" style="border-spacing:0;">
             <tr>
-              <td style="{styles[''main_content'']}">
-                <div class="header" style="{styles[''header'']}">
+              <td style="background-color:#fff;padding:20px 40px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                <div style="font-size:24px;font-weight:bold;color:#0d172b;padding-bottom:20px;text-align:center;border-bottom:2px solid #29b5e8;">
                   {subject}
                 </div>
-                <div class="content-body" style="{styles[''content_body'']}">
+                <div style="font-size:15px;line-height:1.8;color:#3d4c5c;padding-top:20px;">
                   {html_content}
                 </div>
               </td>
@@ -3871,18 +3874,16 @@ def main(session, subject: str, body_markdown: str) -> str:
         </td>
       </tr>
       <tr>
-        <td class="footer" style="{styles[''footer'']}">
-          Powered by Snowflake Intelligence<br>
-          <a href="#" style="color: #888888;">配信停止</a>
+        <td style="text-align:center;padding:20px;font-size:12px;color:#888;">
+          Powered by Snowflake Intelligence
         </td>
       </tr>
     </table>
   </center>
 </body>
-</html>
-"""
+</html>"""
     return html_template
-';
+$$;
 
 CREATE OR REPLACE PROCEDURE send_mail(recipient TEXT, subject TEXT, text TEXT)
 RETURNS TEXT
