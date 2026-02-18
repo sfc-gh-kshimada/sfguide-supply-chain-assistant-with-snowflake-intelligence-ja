@@ -3774,7 +3774,7 @@ import markdown
 import re
 
 def preprocess_japanese_text(text: str) -> str:
-    lines = text.split(''\n'')
+    lines = text.split(''\\n'')
     result = []
     for line in lines:
         stripped = line.strip()
@@ -3807,8 +3807,8 @@ def preprocess_japanese_text(text: str) -> str:
             result.append(f''&nbsp;&nbsp;&nbsp;&nbsp;{stripped}'')
             continue
         result.append(stripped)
-    processed = ''\n''.join(result)
-    processed = re.sub(r''\n{3,}'', ''\n\n'', processed)
+    processed = ''\\n''.join(result)
+    processed = re.sub(r''\\n{3,}'', ''\\n\\n'', processed)
     return processed
 
 def main(session, subject: str, body_markdown: str) -> str:
